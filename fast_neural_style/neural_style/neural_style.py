@@ -217,6 +217,7 @@ def train(args):
     # 加载数据集 并进行数据预处理
     train_dataset = datasets.ImageFolder(args.dataset, transform)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
+    steps_per_epoch = np.ceil(len(train_loader) / args.batch_size)
 
     # 风格图片预处理 transform
     style_transform = transforms.Compose([
@@ -250,7 +251,7 @@ def train(args):
         agg_content_loss = 0.
         agg_style_loss = 0.
         count = 0
-        with tqdm(desc='Epoch {}/{}'.format(e + 1, args.epochs)) as pbar:
+        with tqdm(total=steps_per_epoch, desc='Epoch {}/{}'.format(e + 1, args.epochs)) as pbar:
             for batch_id, (x, _) in enumerate(train_loader):
                 n_batch = len(x)
                 count += n_batch
@@ -307,6 +308,9 @@ def train(args):
                     ckpt_model_path = os.path.join(args.checkpoint_model_dir, ckpt_model_filename)
                     torch.save(transformer.state_dict(), ckpt_model_path)
                     transformer.to(device).train()
+
+                pbar.set_postfix({'total_loss': '%.4f' % float((agg_content_loss + agg_style_loss) / (batch_id + 1))})
+                pbar.update(1)
 
     # 保存最终模型
     transformer.eval().cpu()
