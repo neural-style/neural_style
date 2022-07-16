@@ -2,28 +2,37 @@ import torch
 
 
 class TransformerNet(torch.nn.Module):
+    """
+    定义 Image Transform Net
+    根据论文中所描述的 Image Transform Net 就是最终用来生成内容和风格混合图像的网络
+    论文中阐述的网络结构如下
+    - 首先使用3个卷积模块进行 downsampling 每一个卷积模块之后都要进行一次 batch normalization
+    - 然后使用5个残差模块 之所以采用残差 论文就是考虑了残差连接可以保留一部分原始内容信息
+    - 最后使用3个上采样卷积填充模块进行 upsampling 除了输出层之外 每一个模块后都进行一次 batch normalization
+    """
+    
     def __init__(self):
         super(TransformerNet, self).__init__()
-        # Initial convolution layers
+        # 定义卷积模块
         self.conv1 = ConvLayer(3, 32, kernel_size=9, stride=1)
         self.in1 = torch.nn.InstanceNorm2d(32, affine=True)
         self.conv2 = ConvLayer(32, 64, kernel_size=3, stride=2)
         self.in2 = torch.nn.InstanceNorm2d(64, affine=True)
         self.conv3 = ConvLayer(64, 128, kernel_size=3, stride=2)
         self.in3 = torch.nn.InstanceNorm2d(128, affine=True)
-        # Residual layers
+        # 定义残差模块
         self.res1 = ResidualBlock(128)
         self.res2 = ResidualBlock(128)
         self.res3 = ResidualBlock(128)
         self.res4 = ResidualBlock(128)
         self.res5 = ResidualBlock(128)
-        # Upsampling Layers
+        # 定义 upsampling 模块
         self.deconv1 = UpsampleConvLayer(128, 64, kernel_size=3, stride=1, upsample=2)
         self.in4 = torch.nn.InstanceNorm2d(64, affine=True)
         self.deconv2 = UpsampleConvLayer(64, 32, kernel_size=3, stride=1, upsample=2)
         self.in5 = torch.nn.InstanceNorm2d(32, affine=True)
         self.deconv3 = ConvLayer(32, 3, kernel_size=9, stride=1)
-        # Non-linearities
+        # 非线性激活层
         self.relu = torch.nn.ReLU()
 
     def forward(self, X):
@@ -42,6 +51,13 @@ class TransformerNet(torch.nn.Module):
 
 
 class ConvLayer(torch.nn.Module):
+    """
+    定义卷积模块
+    卷积模块中包含以下层
+    - ReflectionPad2d 使用输入边界的反射填充输入张量
+    - Conv2d 进行卷积
+    """
+
     def __init__(self, in_channels, out_channels, kernel_size, stride):
         super(ConvLayer, self).__init__()
         reflection_padding = kernel_size // 2
@@ -55,9 +71,13 @@ class ConvLayer(torch.nn.Module):
 
 
 class ResidualBlock(torch.nn.Module):
-    """ResidualBlock
-    introduced in: https://arxiv.org/abs/1512.03385
-    recommended architecture: http://torch.ch/blog/2016/02/04/resnets.html
+    """
+    定义残差模块
+    残差模块中包含以下层
+    - 卷积层 + batch normalization
+    - RuLe 非线性激活层
+    - 卷积层 + batch normalization
+    - 残差连接层
     """
 
     def __init__(self, channels):
@@ -77,10 +97,12 @@ class ResidualBlock(torch.nn.Module):
 
 
 class UpsampleConvLayer(torch.nn.Module):
-    """UpsampleConvLayer
-    Upsamples the input and then does a convolution. This method gives better results
-    compared to ConvTranspose2d.
-    ref: http://distill.pub/2016/deconv-checkerboard/
+    """
+    定义上采样填充模块
+    上采样填充模块包含以下层
+    - 插值层
+    - ReflectionPad2d 使用输入边界的反射填充输入张量
+    - 卷积层
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride, upsample=None):

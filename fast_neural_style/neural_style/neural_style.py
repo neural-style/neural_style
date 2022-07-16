@@ -196,37 +196,56 @@ def match(args):
 
 
 def train(args):
+    """
+    模型训练过程 使用给定的数据集 对于指定的风格图片进行训练
+    """
+    # 指定设备 判断是否能够使用GPU进行加速
     device = torch.device("cuda" if args.cuda else "cpu")
 
+    # 手动设定随机种子
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
+    # 数据集预处理 transform
     transform = transforms.Compose([
-        transforms.Resize(args.image_size),
-        transforms.CenterCrop(args.image_size),
-        transforms.ToTensor(),
-        transforms.Lambda(lambda x: x.mul(255))
+        transforms.Resize(args.image_size),             # 重新指定大小
+        transforms.CenterCrop(args.image_size),         # 中心裁剪
+        transforms.ToTensor(),                          # 转 Tensor
+        transforms.Lambda(lambda x: x.mul(255))         # 调整像素点至 0-255
     ])
+
+    # 加载数据集 并进行数据预处理
     train_dataset = datasets.ImageFolder(args.dataset, transform)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
 
-    transformer = TransformerNet().to(device)
-    optimizer = Adam(transformer.parameters(), args.lr)
-    mse_loss = torch.nn.MSELoss()
-
-    vgg = Vgg16(requires_grad=False).to(device)
+    # 风格图片预处理 transform
     style_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
+    # 加载风格图片 进行预处理 并构造batch
     style = utils.load_image(args.style_image, size=args.style_size)
     style = style_transform(style)
     style = style.repeat(args.batch_size, 1, 1, 1).to(device)
 
+    # 构造 Image Transform Net
+    transformer = TransformerNet().to(device)
+
+    # 加载 Vgg16 预训练模型
+    vgg = Vgg16(requires_grad=False).to(device)
+
+    # 构造优化器 损失函数
+    optimizer = Adam(transformer.parameters(), args.lr)
+    mse_loss = torch.nn.MSELoss()
+
+    # 计算风格图片在 VGG 网络中每一模块的输出 便于计算 loss 值
     features_style = vgg(utils.normalize_batch(style))
+    # 根据风格图片在 VGG 网络中每一模块的输出构造 Gram 矩阵
     gram_style = [utils.gram_matrix(y) for y in features_style]
 
+    # 训练过程
     for e in range(args.epochs):
+        # 训练模式
         transformer.train()
         agg_content_loss = 0.
         agg_style_loss = 0.
@@ -235,26 +254,37 @@ def train(args):
             for batch_id, (x, _) in enumerate(train_loader):
                 n_batch = len(x)
                 count += n_batch
+                
+                # 梯度归零
                 optimizer.zero_grad()
 
                 x = x.to(device)
+                # 使用 Image Transform Net 生成风格和内容混合图片
                 y = transformer(x)
 
+                # 进行 batch_normalization 防止梯度爆炸/消失 加速收敛
                 y = utils.normalize_batch(y)
                 x = utils.normalize_batch(x)
 
+                # 将 原始内容图片 和 生成混合图片 通过 VGG 获得各层输出结果 方便进行 loss 计算
                 features_y = vgg(y)
                 features_x = vgg(x)
 
-                content_loss = args.content_weight * mse_loss(features_y.relu2_2, features_x.relu2_2)
+                # 计算 内容损失 使用 VGG 的 relu3_3 来计算 论文中指出 VGG 的高层输出能够更好的代表内容特征
+                content_loss = args.content_weight * mse_loss(features_y.relu3_3, features_x.relu3_3)
 
+                # 计算风格特征
                 style_loss = 0.
+                # 使用 VGG 每一个模块的输出 论文中指出 风格特征可以从每一个模块的不同卷积通道之间的相似度来提取
                 for ft_y, gm_s in zip(features_y, gram_style):
                     gm_y = utils.gram_matrix(ft_y)
                     style_loss += mse_loss(gm_y, gm_s[:n_batch, :, :])
                 style_loss *= args.style_weight
 
+                # 计算总的 loss
                 total_loss = content_loss + style_loss
+
+                # 反向传播 
                 total_loss.backward()
                 optimizer.step()
 
@@ -270,6 +300,7 @@ def train(args):
                     )
                     print(mesg)
 
+                # 保存训练过程中的 check_point
                 if args.checkpoint_model_dir is not None and (batch_id + 1) % args.checkpoint_interval == 0:
                     transformer.eval().cpu()
                     ckpt_model_filename = "ckpt_epoch_" + str(e) + "_batch_id_" + str(batch_id + 1) + ".pth"
@@ -277,7 +308,7 @@ def train(args):
                     torch.save(transformer.state_dict(), ckpt_model_path)
                     transformer.to(device).train()
 
-    # save model
+    # 保存最终模型
     transformer.eval().cpu()
     save_model_filename = "epoch_" + str(args.epochs) + ".pth"
     save_model_path = os.path.join(args.save_model_dir, save_model_filename)
@@ -287,62 +318,40 @@ def train(args):
 
 
 def stylize(args):
+    """
+    使用预训练好的风格模型 和指定的内容图片 合成最终结果图片
+    """
+    # 指定设备 判断是否能够使用GPU进行加速
     device = torch.device("cuda" if args.cuda else "cpu")
 
+    # 读取内容图片 并对图片进行预处理
     content_image = utils.load_image(args.content_image, scale=args.content_scale)
     content_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
     content_image = content_transform(content_image)
+    # 转成二维张量
     content_image = content_image.unsqueeze(0).to(device)
 
-    if args.model.endswith(".onnx"):
-        output = stylize_onnx(content_image, args)
-    else:
-        with torch.no_grad():
-            style_model = TransformerNet()
-            state_dict = torch.load(args.model)
-            # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
-            for k in list(state_dict.keys()):
-                if re.search(r'in\d+\.running_(mean|var)$', k):
-                    del state_dict[k]
-            style_model.load_state_dict(state_dict)
-            style_model.to(device)
-            style_model.eval()
-            if args.export_onnx:
-                assert args.export_onnx.endswith(".onnx"), "Export model file should end with .onnx"
-                output = torch.onnx._export(
-                    style_model, content_image, args.export_onnx, opset_version=11,
-                ).cpu()            
-            else:
-                output = style_model(content_image).cpu()
+    # 设置 tensor.requires_grad 为 False 不计算梯度
+    with torch.no_grad():
+        # 构造 Image Transform Net
+        style_model = TransformerNet()
+        # 加载与训练模型
+        state_dict = torch.load(args.model)
+        for k in list(state_dict.keys()):
+            if re.search(r'in\d+\.running_(mean|var)$', k):
+                del state_dict[k]
+        style_model.load_state_dict(state_dict)
+        style_model.to(device)
+        style_model.eval()
+
+        # 获得输出图像
+        output = style_model(content_image).cpu()
+
+    # 保存输出图像
     utils.save_image(args.output_image, output[0])
-
-
-def stylize_onnx(content_image, args):
-    """
-    Read ONNX model and run it using onnxruntime
-    """
-
-    assert not args.export_onnx
-
-    import onnxruntime
-
-    ort_session = onnxruntime.InferenceSession(args.model)
-
-    def to_numpy(tensor):
-        return (
-            tensor.detach().cpu().numpy()
-            if tensor.requires_grad
-            else tensor.cpu().numpy()
-        )
-
-    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(content_image)}
-    ort_outs = ort_session.run(None, ort_inputs)
-    img_out_y = ort_outs[0]
-
-    return torch.from_numpy(img_out_y)
 
 
 def main():
@@ -390,11 +399,9 @@ def main():
     eval_arg_parser.add_argument("--output-image", type=str, required=True,
                                  help="path for saving the output image")
     eval_arg_parser.add_argument("--model", type=str, required=True,
-                                 help="saved model to be used for stylizing the image. If file ends in .pth - PyTorch path is used, if in .onnx - Caffe2 path")
+                                 help="saved model to be used for stylizing the image. File ends in .pth - PyTorch path")
     eval_arg_parser.add_argument("--cuda", type=int, required=True,
                                  help="set it to 1 for running on GPU, 0 for CPU")
-    eval_arg_parser.add_argument("--export_onnx", type=str,
-                                 help="export ONNX model to a given file")
 
     match_arg_parser = subparsers.add_parser("match", help="parser for matching arguments")
     match_arg_parser.add_argument("--epochs", type=int, default=2,
@@ -435,9 +442,7 @@ def main():
     match_arg_parser.add_argument("--content-scale", type=float, default=None,
                                  help="factor for scaling down the content image")
     match_arg_parser.add_argument("--model", type=str, required=True,
-                                 help="saved model to be used for stylizing the image. If file ends in .pth - PyTorch path is used, if in .onnx - Caffe2 path")
-    match_arg_parser.add_argument("--export_onnx", type=str,
-                                 help="export ONNX model to a given file")
+                                 help="saved model to be used for stylizing the image. File ends in .pth - PyTorch path")
     args = main_arg_parser.parse_args()
 
     if args.subcommand is None:
