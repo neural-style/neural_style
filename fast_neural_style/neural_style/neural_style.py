@@ -217,7 +217,7 @@ def train(args):
     # 加载数据集 并进行数据预处理
     train_dataset = datasets.ImageFolder(args.dataset, transform)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
-    steps_per_epoch = np.ceil(len(train_loader) / args.batch_size)
+    steps_per_epoch = len(train_loader)
 
     # 风格图片预处理 transform
     style_transform = transforms.Compose([
