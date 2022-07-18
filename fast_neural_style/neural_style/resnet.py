@@ -39,6 +39,6 @@ class ResNet18(torch.nn.Module):
         h = self.slice4(h)
         layer4 = h
         # 返回不同模块的输出结果
-        vgg_outputs = namedtuple("VggOutputs", ['layer1', 'layer2', 'layer3', 'layer4'])
-        out = vgg_outputs(layer1, layer2, layer3, layer4)
+        resnet_outputs = namedtuple("ResNetOutputs", ['layer1', 'layer2', 'layer3', 'layer4'])
+        out = resnet_outputs(layer1, layer2, layer3, layer4)
         return out
