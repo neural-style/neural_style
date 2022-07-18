@@ -64,6 +64,7 @@ def match(content_image = 'images\content-images\\amber.jpg'):
 
     content_image = utils.load_image(content_image,size=1080)   #size很重要
     content_transform = transforms.Compose([
+        transforms.Resize(image_size),
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
@@ -164,7 +165,7 @@ def match(content_image = 'images\content-images\\amber.jpg'):
     os.makedirs(save_path)
     save_path=os.path.join(save_path,'res.jpg')
     utils.save_image(save_path, output[0])
-
+    return save_path
 
 def random_train(style_path_par="images/style-images/mosaic.jpg", content_path_par='images/content-images/COCO.jpg'):
     epochs = 30
