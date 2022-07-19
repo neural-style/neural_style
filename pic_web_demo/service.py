@@ -159,7 +159,7 @@ def match(content_image='static\\images\\input\\input.jpg'):
     return style_path, save_path  # 返回风格图片路径、融合图片路径
 
 
-def random_train(style_path_par="../static/images/style/nahan.jpg", content_path_par='../static/images/input/input.jpg'):
+def random_train(style_path_par="static/images/style/mosaic.jpg", content_path_par='static/images/input/input.jpg'):
     epochs = 30
     batch_size = 4
 
@@ -169,11 +169,8 @@ def random_train(style_path_par="../static/images/style/nahan.jpg", content_path
     # 风格图像(filename)
     style_path = style_path_par
 
-    # 训练的模型保存的路径
-    save_model_dir = '../static/models'
-
     # 输出图像路径
-    output_image_epoch = "../static/images/output/random"
+    output_image_epoch = "static/images/output/random"
 
     # size of training images, default is 256 X 256
     image_size = 256
@@ -206,10 +203,6 @@ def random_train(style_path_par="../static/images/style/nahan.jpg", content_path
     ])
     train_image = train_transform(train_image)
     train_image = train_image.unsqueeze(0).to(device)
-    # print(train_image.shape)
-    # print(type(train_image))
-    # print('单张')
-    # print(train_image)
 
     transformer = TransformerNet().to(device)
     optimizer = Adam(transformer.parameters(), lr)
@@ -298,16 +291,10 @@ def random_train(style_path_par="../static/images/style/nahan.jpg", content_path
         print('保存epochs', e + 1, '的训练生成图像：', save_pic_path)
         utils.save_image(save_pic_path, output[0])
 
-    # save model
-    transformer.eval().cpu()
-    save_model_filename = tim + '.pth'
-    save_model_path = os.path.join(save_model_dir, save_model_filename)
-    torch.save(transformer.state_dict(), save_model_path)
-    print("\nDone, trained model saved at", save_model_path)
-    return (save_dir_path, epochs)
+    return save_dir_path, epochs
 
 
-def pre_stylize(content_image_path_par='../static/images/input/input.jpg', model_path_par='../static/models/mosaic.pth'):
+def pre_stylize(content_image_path_par='static/images/input/input.jpg', model_path_par='static/models/mosaic.pth'):
     # 调用模型路径
     model_path = model_path_par
 
@@ -318,7 +305,7 @@ def pre_stylize(content_image_path_par='../static/images/input/input.jpg', model
     content_scale = None
 
     # 输出图像路径
-    output_image = '../static/images/output/random'
+    output_image = 'static/images/output/random'
 
     # 生成输出图像文件夹
     save_dir_path = os.path.join(output_image, str(time.ctime()).replace(' ', '_').replace(':', '.'))
