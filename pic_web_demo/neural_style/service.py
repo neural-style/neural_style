@@ -166,7 +166,7 @@ def match(content_image = 'images\content-images\\amber.jpg'):
     utils.save_image(save_path, output[0])
 
 
-def random_train(style_path_par="images/style-images/mosaic.jpg", content_path_par='images/content-images/COCO.jpg'):
+def random_train(style_path_par="../static/images/style/nahan.jpg", content_path_par='../static/images/input/input.jpg'):
     epochs = 30
     batch_size = 4
 
@@ -177,10 +177,10 @@ def random_train(style_path_par="images/style-images/mosaic.jpg", content_path_p
     style_path = style_path_par
 
     # 训练的模型保存的路径
-    save_model_dir = 'saved_models'
+    save_model_dir = '../static/models'
 
     # 输出图像路径
-    output_image_epoch = "images/output-images"
+    output_image_epoch = "../static/images/output/random"
 
     # size of training images, default is 256 X 256
     image_size = 256
@@ -311,11 +311,10 @@ def random_train(style_path_par="images/style-images/mosaic.jpg", content_path_p
     save_model_path = os.path.join(save_model_dir, save_model_filename)
     torch.save(transformer.state_dict(), save_model_path)
     print("\nDone, trained model saved at", save_model_path)
-    return save_pic_path
+    return save_dir_path
 
 
-def pre_stylize(content_image_path_par='images/content-images/COCO.jpg',
-            model_path_par='saved_models/mosaic.pth'):
+def pre_stylize(content_image_path_par='../static/images/input/input.jpg',model_path_par='../static/models/mosaic.pth'):
     # 调用模型路径
     model_path = model_path_par
 
@@ -326,7 +325,7 @@ def pre_stylize(content_image_path_par='images/content-images/COCO.jpg',
     content_scale = None
 
     # 输出图像路径
-    output_image = 'images/output-images'
+    output_image = '../static/images/output/random'
 
     # 生成输出图像文件夹
     save_dir_path = os.path.join(output_image, str(time.ctime()).replace(' ', '_').replace(':', '.'))
@@ -355,7 +354,7 @@ def pre_stylize(content_image_path_par='images/content-images/COCO.jpg',
         output = style_model(content_image).cpu()
 
     # 保存风格迁移图像
-    save_pic_filename = 'neural_picture.jpg'
+    save_pic_filename = '1.jpg'
     save_pic_path = os.path.join(save_dir_path, save_pic_filename)
     print('保存eval生成图像：', save_pic_path)
     utils.save_image(save_pic_path, output[0])
