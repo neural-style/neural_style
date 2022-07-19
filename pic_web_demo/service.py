@@ -71,7 +71,7 @@ def match(base):
         elif i == 1:
             st_image = os.path.join(style_image, 'mosaic.jpg')
         elif i == 2:
-            st_image = os.path.join(style_image, 'rain-princess.jpg')
+            st_image = os.path.join(style_image, 'rain_princess.jpg')
         elif i == 3:
             st_image = os.path.join(style_image, 'udnie.jpg')
         style = utils.load_image(st_image)
@@ -236,6 +236,7 @@ def random_train(style_path_par="./static/images/style/mosaic.jpg", content_path
     # 生成输出图像文件夹
     tim = str(time.ctime()).replace(' ', '_').replace(':', '.')
     save_dir_path = os.path.join(output_image_epoch, tim)
+    print(save_dir_path)
     os.makedirs(save_dir_path)
 
     STEPS_PER_EPOCH = 100
@@ -296,7 +297,9 @@ def random_train(style_path_par="./static/images/style/mosaic.jpg", content_path
     return save_dir_path, epochs
 
 
-def pre_stylize(content_image_path_par='./static/images/input/input.jpg', model_path_par='./static/models/mosaic.pth'):
+def pre_stylize(base, style):
+    content_image_path_par = base + '\static\images\input\input.jpg'
+    model_path_par = base + '\static\models\\' + style + '.pth'
     # 调用模型路径
     model_path = model_path_par
 
@@ -307,10 +310,11 @@ def pre_stylize(content_image_path_par='./static/images/input/input.jpg', model_
     content_scale = None
 
     # 输出图像路径
-    output_image = './static/images/output/random'
+    output_image = base + '\static\images\output\\random'
 
     # 生成输出图像文件夹
     save_dir_path = os.path.join(output_image, str(time.ctime()).replace(' ', '_').replace(':', '.'))
+    print(save_dir_path)
     os.makedirs(save_dir_path)
 
     # 内容图像

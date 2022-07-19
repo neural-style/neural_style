@@ -219,11 +219,15 @@ def diy_ok():
     return render_template('diy.html', flag=flag[-1], flag_diy=flag_diy[-1])
 
 
-@app.route('/generate', methods=['POST', 'GET'])
-def generate():
+@app.route('/generate/default', methods=['POST', 'GET'])
+def generate_default():
     print(flag_generate)
     style = flag_generate[-1]
-    return render_template('generate.html', style=style)
+    base = os.path.split(os.path.realpath(__file__))[0]
+    print(base)
+    result = service.pre_stylize(base, style).split('\\')[-2]
+    print(result)
+    return render_template('generate.html', style=style, output=result)
 
 
 @app.route('/match', methods=['POST', 'GET'])

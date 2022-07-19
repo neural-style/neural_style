@@ -69,7 +69,7 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
         elif i == 1:
             st_image = os.path.join(style_image, 'mosaic.jpg')
         elif i == 2:
-            st_image = os.path.join(style_image, 'rain-princess.jpg')
+            st_image = os.path.join(style_image, 'rain_princess.jpg')
         elif i == 3:
             st_image = os.path.join(style_image, 'udnie.jpg')
         style = utils.load_image(st_image)

@@ -42,7 +42,7 @@
         <h2>迁移图片：</h2>
         <a href="http://127.0.0.1:5000/generate"><input type="submit" value="生成" class="button-new" style="margin-top:15px;"/></a>
         <br>
-        <img src="{{ url_for('static', filename= './images/output/output.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
+        <img src="{{ url_for('static', filename= './images/output/random/' + output + '/1.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
     </div>
 
 </body>

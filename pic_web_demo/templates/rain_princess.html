@@ -14,7 +14,7 @@
                 <h2>内容选择：</h2>
                 <input type="file" name="file" value="文件" style="margin-top:20px;"/>
                 <input type="submit" value="上传" class="button-new" style="margin-top:15px;"/>
-            </form>a
+            </form>
         {% if flag == 1 %}
         <img src="{{ url_for('static', filename= './images/input/input.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
         {% endif %}
@@ -38,12 +38,12 @@
             </div>
         </div>
         <script src="../static/js/style.js"></script>
-        <img src="{{ url_for('static', filename= './images/style/rain-princess.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
+        <img src="{{ url_for('static', filename= './images/style/rain_princess.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
     </div>
 
     <div class="right">
         <h2>迁移图片：</h2>
-        <a href="http://127.0.0.1:5000/generate"><input type="submit" value="生成" class="button-new" style="margin-top:15px;"/></a>
+        <a href="http://127.0.0.1:5000/generate/default"><input type="submit" value="生成" class="button-new" style="margin-top:15px;"/></a>
     </div>
 </body>
 </html>
