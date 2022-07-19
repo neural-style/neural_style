@@ -228,10 +228,16 @@ def generate():
 
 @app.route('/match', methods=['POST', 'GET'])
 def match():
-    style, result = service.match()
+    base = os.path.split(os.path.realpath(__file__))[0]
+    print(base)
+    style, result = service.match(base)
     print(style)
     print(result)
-    return render_template('match.html')
+    sty = style.split('\\')[-1]
+    res = result.split('\\')[-2] + '/' + result.split('\\')[-1]
+    print(sty)
+    print(res)
+    return render_template('match.html', style=sty, result=res)
 
 
 if __name__ == '__main__':
