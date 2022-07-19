@@ -22,7 +22,7 @@ body {
  * --------------------------------------------------
  */
 .c-dropdown {
-    width:100px;
+    width:115px;
     position: relative;
     display: inline-block;
     text-align: left;
@@ -46,7 +46,7 @@ body {
 }
 /*当下拉展开时，背景才是不透明的*/
 .c-dropdown.is-open .c-dropdown__list{
-    width:102px;
+    width:117px;
     opacity: 1;
     visibility:visible;
     top:125%;
@@ -129,8 +129,8 @@ body {
  */
 .c-button--dropdown {
     box-sizing:border-box;
-    width:100px;
-    max-width:100px;
+    width:115px;
+    max-width:115px;
     height:30px;
     padding: 4px 39px 10px 11px;
     background-color: #fff;
