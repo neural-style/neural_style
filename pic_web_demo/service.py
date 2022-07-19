@@ -159,7 +159,7 @@ def match(content_image='static\\images\\input\\input.jpg'):
     return style_path, save_path  # 返回风格图片路径、融合图片路径
 
 
-def random_train(style_path_par="static/images/style/mosaic.jpg", content_path_par='static/images/input/input.jpg'):
+def random_train(style_path_par="../static/images/style/mosaic.jpg", content_path_par='../static/images/input/input.jpg'):
     epochs = 30
     batch_size = 4
 
@@ -170,7 +170,7 @@ def random_train(style_path_par="static/images/style/mosaic.jpg", content_path_p
     style_path = style_path_par
 
     # 输出图像路径
-    output_image_epoch = "static/images/output/random"
+    output_image_epoch = "../static/images/output/random"
 
     # size of training images, default is 256 X 256
     image_size = 256
@@ -294,7 +294,7 @@ def random_train(style_path_par="static/images/style/mosaic.jpg", content_path_p
     return save_dir_path, epochs
 
 
-def pre_stylize(content_image_path_par='static/images/input/input.jpg', model_path_par='static/models/mosaic.pth'):
+def pre_stylize(content_image_path_par='../static/images/input/input.jpg', model_path_par='../static/models/mosaic.pth'):
     # 调用模型路径
     model_path = model_path_par
 
@@ -305,7 +305,7 @@ def pre_stylize(content_image_path_par='static/images/input/input.jpg', model_pa
     content_scale = None
 
     # 输出图像路径
-    output_image = 'static/images/output/random'
+    output_image = '../static/images/output/random'
 
     # 生成输出图像文件夹
     save_dir_path = os.path.join(output_image, str(time.ctime()).replace(' ', '_').replace(':', '.'))
