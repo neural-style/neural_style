@@ -12,19 +12,20 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.onnx
 from tqdm import tqdm
-import utils
-from transformer_net import TransformerNet
-from vgg import Vgg16
+from neural_style import utils
+from neural_style.transformer_net import TransformerNet
+from neural_style.vgg import Vgg16
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def match(content_image = 'static\\images\\input\\input.jpg'):
+
+def match(content_image='static\\images\\input\\input.jpg'):
     '''
     最佳风格匹配
 
     return .jpg with filename
     '''
-    #---------------------------------arguments---------------------------------
+    # ---------------------------------arguments---------------------------------
     style_image = 'static\\images\\style'
     seed = 42
     image_size = 256
@@ -34,7 +35,7 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
     style_weight = 1e5
     model = 'static\\models'
     output_image = 'static\\images\\output'
-    #-------------------------------train-----------------------------------
+    # -------------------------------train-----------------------------------
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     np.random.seed(seed)
@@ -50,8 +51,8 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
         transforms.Lambda(lambda x: x.mul(255))
     ])
 
-    min_loss = 999999999999.   #最小损失函数值
-    min_arg = 0     #最小损失函数值对应的风格图片
+    min_loss = 999999999999.  # 最小损失函数值
+    min_arg = 0  # 最小损失函数值对应的风格图片
 
     content_image = utils.load_image(content_image)
 
@@ -63,7 +64,7 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
     ])
     content_image = content_transform(content_image)
     content_image = content_image.unsqueeze(0).to(device)
-    for i in range(4):  #四个默认风格图片
+    for i in range(4):  # 四个默认风格图片
         if i == 0:
             st_image = os.path.join(style_image, 'candy.jpg')
         elif i == 1:
@@ -87,12 +88,12 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
         # 使用tqdm提示训练进度
         with tqdm(desc='style {}/{}'.format(i + 1, 4)) as pbar:
             # 每个epoch训练settings.STEPS_PER_EPOCH次
-            x= content_image
+            x = content_image
             n_batch = len(x)
             count += n_batch
             optimizer.zero_grad()
             x = x.to(device)
-            #---------------
+            # ---------------
 
             with torch.no_grad():
                 style_model = TransformerNet()
@@ -113,12 +114,12 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
                 style_model.eval()
 
                 pre_y = style_model(content_image).cpu()
-            #---------------------------------
+            # ---------------------------------
 
             y = pre_y.to(device)
             y = y[0]
-            y=y[:,:256,:256]
-            y=y.view(1,3,256,256)
+            y = y[:, :256, :256]
+            y = y.view(1, 3, 256, 256)
             x = utils.normalize_batch(x)
             features_y = vgg(y)
             features_x = vgg(x)
@@ -147,15 +148,15 @@ def match(content_image = 'static\\images\\input\\input.jpg'):
             output = pre_y
             style_path = st_image
 
-    #-----------------------------result----------------------------------
+    # -----------------------------result----------------------------------
 
-    print("the best match style(0~3): "+str(min_arg))
-    save_path = os.path.join(output_image,'match')
-    save_path = os.path.join(save_path,str(time.ctime()).replace(' ', '_').replace(':', '.'))
+    print("the best match style(0~3): " + str(min_arg))
+    save_path = os.path.join(output_image, 'match')
+    save_path = os.path.join(save_path, str(time.ctime()).replace(' ', '_').replace(':', '.'))
     os.makedirs(save_path)
-    save_path=os.path.join(save_path,'1.jpg')
+    save_path = os.path.join(save_path, '1.jpg')
     utils.save_image(save_path, output[0])
-    return style_path, save_path    #返回风格图片路径、融合图片路径
+    return style_path, save_path  # 返回风格图片路径、融合图片路径
 
 
 def random_train(style_path_par="../static/images/style/nahan.jpg", content_path_par='../static/images/input/input.jpg'):
@@ -303,10 +304,10 @@ def random_train(style_path_par="../static/images/style/nahan.jpg", content_path
     save_model_path = os.path.join(save_model_dir, save_model_filename)
     torch.save(transformer.state_dict(), save_model_path)
     print("\nDone, trained model saved at", save_model_path)
-    return (save_dir_path,epochs)
+    return (save_dir_path, epochs)
 
 
-def pre_stylize(content_image_path_par='../static/images/input/input.jpg',model_path_par='../static/models/mosaic.pth'):
+def pre_stylize(content_image_path_par='../static/images/input/input.jpg', model_path_par='../static/models/mosaic.pth'):
     # 调用模型路径
     model_path = model_path_par
 

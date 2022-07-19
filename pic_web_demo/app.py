@@ -6,6 +6,7 @@ import cv2
 import time
 from datetime import timedelta
 
+import service
 
 # 设置允许的文件格式
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'JPG', 'PNG', 'bmp'}
@@ -222,8 +223,15 @@ def diy_ok():
 def generate():
     print(flag_generate)
     style = flag_generate[-1]
-
     return render_template('generate.html', style=style)
+
+
+@app.route('/match', methods=['POST', 'GET'])
+def match():
+    style, result = service.match()
+    print(style)
+    print(result)
+    return render_template('match.html')
 
 
 if __name__ == '__main__':
