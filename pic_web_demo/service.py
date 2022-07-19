@@ -19,22 +19,22 @@ from neural_style.vgg import Vgg16
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def match(content_image='static\\images\\input\\input.jpg'):
+def match(content_image='../static/images/input/input.jpg'):
     '''
     最佳风格匹配
 
     return .jpg with filename
     '''
     # ---------------------------------arguments---------------------------------
-    style_image = 'static\\images\\style'
+    style_image = '../static/images/style'
     seed = 42
     image_size = 256
     batch_size = 4
     lr = 1e-3
     content_weight = 1
     style_weight = 1e5
-    model = 'static\\models'
-    output_image = 'static\\images\\output'
+    model = '../static/models'
+    output_image = '../static/images/output'
     # -------------------------------train-----------------------------------
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
