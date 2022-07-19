@@ -311,7 +311,7 @@ def random_train(style_path_par="../static/images/style/nahan.jpg", content_path
     save_model_path = os.path.join(save_model_dir, save_model_filename)
     torch.save(transformer.state_dict(), save_model_path)
     print("\nDone, trained model saved at", save_model_path)
-    return save_dir_path
+    return (save_dir_path,epochs)
 
 
 def pre_stylize(content_image_path_par='../static/images/input/input.jpg',model_path_par='../static/models/mosaic.pth'):
