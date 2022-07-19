@@ -20,10 +20,14 @@
         $dropdown.find('.js-dropdown__input').val($item.data('dropdown-value'));
         //更新span的值为选中li的值
         $dropdown.find('.js-dropdown__current').text($item.text());
-        if($item.data('dropdown-value')==="xingkong")
-            window.location.href= "http://127.0.0.1:5000/xingkong";
-        if($item.data('dropdown-value')==="nahan")
-            window.location.href= "http://127.0.0.1:5000/nahan";
+        if($item.data('dropdown-value')==="candy")
+            window.location.href= "http://127.0.0.1:5000/candy";
+        if($item.data('dropdown-value')==="mosaic")
+            window.location.href= "http://127.0.0.1:5000/mosaic";
+        if($item.data('dropdown-value')==="rain_princess")
+            window.location.href= "http://127.0.0.1:5000/rain_princess";
+        if($item.data('dropdown-value')==="udnie")
+            window.location.href= "http://127.0.0.1:5000/udnie";
         if($item.data('dropdown-value')==="diy")
             window.location.href= "http://127.0.0.1:5000/diy";
     });

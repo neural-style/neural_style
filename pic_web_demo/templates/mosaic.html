@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图像风格迁移</title>
+    <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <h1>图像风格迁移</h1>
+
+    <div class="left">
+            <form action="" enctype='multipart/form-data' method='POST'>
+                <h2>内容选择：</h2>
+                <input type="file" name="file" value="文件" style="margin-top:20px;"/>
+                <input type="submit" value="上传" class="button-new" style="margin-top:15px;"/>
+            </form>
+        {% if flag == 1 %}
+        <img src="{{ url_for('static', filename= './images/input/input.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
+        {% endif %}
+    </div>
+
+    <div class="middle" style="z-index:999">
+        <h2>风格选择：</h2>
+        <div class="container">
+            <div class="c-dropdown js-dropdown" style="z-index:999">
+                <input type="hidden" name="province" class="js-dropdown__input">
+                <span class="c-button c-button--dropdown js-dropdown__current">mosaic</span>
+                <ul class="c-dropdown__list">
+                    <li class="c-dropdown__item" data-dropdown-value="candy">candy</li>
+                    <li class="c-dropdown__item" data-dropdown-value="mosaic">mosaic</li>
+                    <li class="c-dropdown__item" data-dropdown-value="rain_princess">rain_princess</li>
+                    <li class="c-dropdown__item" data-dropdown-value="udnie">udnie</li>
+                    <li class="c-dropdown__item" data-dropdown-value="match">match</li>
+                    <li class="c-dropdown__item" data-dropdown-value="diy">自定义 </li>
+                </ul>
+                <span class="c-triangle"></span>
+            </div>
+        </div>
+        <script src="../static/js/style.js"></script>
+        <img src="{{ url_for('static', filename= './images/style/mosaic.jpg',_t=val1) }}" width="400" height="400" alt="你的图片被外星人劫持了～～"/>
+    </div>
+
+    <div class="right">
+        <h2>迁移图片：</h2>
+        <a href="http://127.0.0.1:5000/generate"><input type="submit" value="生成" class="button-new" style="margin-top:15px;"/></a>
+    </div>
+</body>
+</html>

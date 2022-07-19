@@ -51,9 +51,9 @@ def upload():
     return render_template('upload.html', flag=flag[-1])
 
 
-@app.route('/xingkong', methods=['POST', 'GET'])
-def xingkong():
-    flag_generate.append('xingkong')
+@app.route('/candy', methods=['POST', 'GET'])
+def candy():
+    flag_generate.append('candy')
     if request.method == 'POST':
         flag.append(1)
 
@@ -75,13 +75,13 @@ def xingkong():
 
         os.remove(upload_path)
 
-        return render_template('xingkong.html', flag=flag[-1])
-    return render_template('xingkong.html', flag=flag[-1])
+        return render_template('candy.html', flag=flag[-1])
+    return render_template('candy.html', flag=flag[-1])
 
 
-@app.route('/nahan', methods=['POST', 'GET'])
-def nahan():
-    flag_generate.append('nahan')
+@app.route('/mosaic', methods=['POST', 'GET'])
+def mosaic():
+    flag_generate.append('mosaic')
     if request.method == 'POST':
         flag.append(1)
 
@@ -103,8 +103,64 @@ def nahan():
 
         os.remove(upload_path)
 
-        return render_template('nahan.html', flag=flag[-1])
-    return render_template('nahan.html', flag=flag[-1])
+        return render_template('mosaic.html', flag=flag[-1])
+    return render_template('mosaic.html', flag=flag[-1])
+
+
+@app.route('/rain_princess', methods=['POST', 'GET'])
+def rain_princess():
+    flag_generate.append('rain_princess')
+    if request.method == 'POST':
+        flag.append(1)
+
+        f = request.files['file']
+
+        if not (f and allowed_file(f.filename)):
+            return jsonify({"error": 1001, "msg": "请检查上传的图片类型，仅限于png、PNG、jpg、JPG、bmp"})
+
+        user_input = request.form.get("name")
+
+        basepath = os.path.dirname(__file__)  # 当前文件所在路径
+
+        upload_path = os.path.join(basepath, 'static\\images\\input', secure_filename(f.filename))  # 注意：没有的文件夹一定要先创建，不然会提示没有该路径
+        f.save(upload_path)
+
+        # 使用Opencv转换一下图片格式和名称
+        img = cv2.imread(upload_path)
+        cv2.imwrite(os.path.join(basepath, 'static\\images\\input', 'input.jpg'), img)
+
+        os.remove(upload_path)
+
+        return render_template('rain_princess.html', flag=flag[-1])
+    return render_template('rain_princess.html', flag=flag[-1])
+
+
+@app.route('/udnie', methods=['POST', 'GET'])
+def udnie():
+    flag_generate.append('udnie')
+    if request.method == 'POST':
+        flag.append(1)
+
+        f = request.files['file']
+
+        if not (f and allowed_file(f.filename)):
+            return jsonify({"error": 1001, "msg": "请检查上传的图片类型，仅限于png、PNG、jpg、JPG、bmp"})
+
+        user_input = request.form.get("name")
+
+        basepath = os.path.dirname(__file__)  # 当前文件所在路径
+
+        upload_path = os.path.join(basepath, 'static\\images\\input', secure_filename(f.filename))  # 注意：没有的文件夹一定要先创建，不然会提示没有该路径
+        f.save(upload_path)
+
+        # 使用Opencv转换一下图片格式和名称
+        img = cv2.imread(upload_path)
+        cv2.imwrite(os.path.join(basepath, 'static\\images\\input', 'input.jpg'), img)
+
+        os.remove(upload_path)
+
+        return render_template('udnie.html', flag=flag[-1])
+    return render_template('udnie.html', flag=flag[-1])
 
 
 @app.route('/diy', methods=['POST', 'GET'])
