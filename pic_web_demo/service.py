@@ -161,7 +161,9 @@ def match(base):
     return style_path, save_path  # 返回风格图片路径、融合图片路径
 
 
-def random_train(style_path_par="./static/images/style/mosaic.jpg", content_path_par='./static/images/input/input.jpg'):
+def random_train(base):
+    style_path_par = base + "\static\images\style\diy.jpg"
+    content_path_par = base + '\static\images\input\input.jpg'
     epochs = 30
     batch_size = 4
 
@@ -172,7 +174,7 @@ def random_train(style_path_par="./static/images/style/mosaic.jpg", content_path
     style_path = style_path_par
 
     # 输出图像路径
-    output_image_epoch = "./static/images/output/random"
+    output_image_epoch = base + "\static\images\output\\random"
 
     # size of training images, default is 256 X 256
     image_size = 256

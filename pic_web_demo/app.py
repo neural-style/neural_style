@@ -14,7 +14,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'JPG', 'PNG', 'bmp'}
 flag = [0]
 flag_diy = [0]
 flag_generate = []
-
+res = []
+flag_random = [0]
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -228,6 +229,20 @@ def generate_default():
     result = service.pre_stylize(base, style).split('\\')[-2]
     print(result)
     return render_template('generate.html', style=style, output=result)
+
+
+@app.route('/generate/diy<int:number>', methods=['POST', 'GET'])
+def generate_diy(number):
+    base = os.path.split(os.path.realpath(__file__))[0]
+    print(base)
+    if number == 1 and flag_random[-1] == 0:
+        result, num = service.random_train(base)
+        flag_random.append(1)
+        print(result)
+        res.append(result.split('\\')[-1])
+    print(res)
+    print(str(number))
+    return render_template('generate_diy.html', style='diy', result=res[-1], num=str(number))
 
 
 @app.route('/match', methods=['POST', 'GET'])
