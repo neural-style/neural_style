@@ -37,6 +37,7 @@ def match(base):
     model = base + '\\static\\models'
     output_image = base + '\\static\\images\\output'
     # -------------------------------train-----------------------------------
+    stcontent = content_image
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     np.random.seed(seed)
@@ -146,12 +147,38 @@ def match(base):
         if agg_content_loss < min_loss:
             min_loss = agg_content_loss
             min_arg = i
-            output = pre_y
             style_path = st_image
 
     # -----------------------------result----------------------------------
-
     print("the best match style(0~3): " + str(min_arg))
+    if min_arg == 0:
+        model_path = os.path.join(model, 'candy.pth')
+    elif min_arg == 1:
+        model_path = os.path.join(model, 'mosaic.pth')
+    elif min_arg == 2:
+        model_path = os.path.join(model, 'rain_princess.pth')
+    elif min_arg == 3:
+        model_path = os.path.join(model, 'udnie.pth')
+    content_image = utils.load_image(stcontent, scale=None)
+    content_transform = transforms.Compose([
+        transforms.Resize((1080,1080)),
+        transforms.ToTensor(),
+        transforms.Lambda(lambda x: x.mul(255))
+    ])
+    content_image = content_transform(content_image)
+    content_image = content_image.unsqueeze(0).to(device)
+    with torch.no_grad():
+        style_model = TransformerNet()
+        state_dict = torch.load(model_path)
+        # remove saved deprecated running_* keys in InstanceNorm from the checkpoint
+        for k in list(state_dict.keys()):
+            if re.search(r'in\d+\.running_(mean|var)$', k):
+                del state_dict[k]
+        style_model.load_state_dict(state_dict)
+        style_model.to(device)
+        style_model.eval()
+        output = style_model(content_image).cpu()
+
     save_path = os.path.join(output_image, 'match')
     save_path = os.path.join(save_path, str(time.ctime()).replace(' ', '_').replace(':', '.'))
     print(save_path)
