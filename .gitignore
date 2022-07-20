@@ -1,7 +1,12 @@
 .idea
 __pycache__
-dataset
-train
 .ipynb_checkpoints
-images
-output
+
+fast_neural_style/dataset/
+fast_neural_style/train/
+fast_neural_style/images/
+fast_neural_style/match/
+fast_neural_style/output/
+
+pic_web_demo/static/images/input
+pic_web_demo/static/images/output
