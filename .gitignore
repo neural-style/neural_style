@@ -8,5 +8,8 @@ fast_neural_style/images/
 fast_neural_style/match/
 fast_neural_style/output/
 
-pic_web_demo/static/images/input
-pic_web_demo/static/images/output
+pic_web_demo/static/images/input/*
+!pic_web_demo/static/images/input/README.md
+pic_web_demo/static/images/output/*/*
+!pic_web_demo/static/images/output/*/README.md
+!pic_web_demo/static/images/output/*/README.md
