@@ -188,7 +188,7 @@ def match(base):
     return style_path, save_path  # 返回风格图片路径、融合图片路径
 
 
-def random_train(base):
+def random_stylize(base):
     style_path_par = base + "\static\images\style\diy.jpg"
     content_path_par = base + '\static\images\input\input.jpg'
     epochs = 30

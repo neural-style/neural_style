@@ -236,7 +236,7 @@ def generate_diy(number):
     base = os.path.split(os.path.realpath(__file__))[0]
     print(base)
     if number == 1 and flag_random[-1] == 0:
-        result, num = service.random_train(base)
+        result, num = service.random_stylize(base)
         flag_random.append(1)
         print(result)
         res.append(result.split('\\')[-1])
