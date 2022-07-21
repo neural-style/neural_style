@@ -12,6 +12,8 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.onnx
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+
 import utils
 from transformer_net import TransformerNet
 from vgg import Vgg16
@@ -76,6 +78,10 @@ def train(args):
     features_style = vgg(utils.normalize_batch(style))
     # 根据风格图片在 VGG 网络中每一模块的输出构造 Gram 矩阵
     gram_style = [utils.gram_matrix(y) for y in features_style]
+
+    content_loss_history = []
+    style_loss_history = []
+    total_loss_history = []
 
     # 训练过程
     for e in range(args.epochs):
@@ -145,6 +151,10 @@ def train(args):
                 pbar.set_postfix({'total_loss': '%.4f' % float((agg_content_loss + agg_style_loss) / (batch_id + 1))})
                 pbar.update(1)
 
+                content_loss_history.append(float(agg_content_loss / (batch_id + 1)))
+                style_loss_history.append(float(agg_style_loss / (batch_id + 1)))
+                total_loss_history.append(float((agg_content_loss + agg_style_loss) / (batch_id + 1)))
+
     # 保存最终模型
     transformer.eval().cpu()
     save_model_filename = "epoch_" + str(args.epochs) + ".pth"
@@ -152,6 +162,16 @@ def train(args):
     torch.save(transformer.state_dict(), save_model_path)
 
     print("\nDone, trained model saved at", save_model_path)
+
+    t = np.linspace(1, len(content_loss_history), len(content_loss_history))
+    plt.plot(t, content_loss_history, label='Content-Loss',color="green")
+    plt.plot(t, style_loss_history, label='Style-Loss',color="blue")
+    plt.plot(t, total_loss_history, label='Total-Loss',color="red")
+    plt.title('Loss history')
+    plt.xlabel('step')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig(fname="loss_history_{}.jpg".format(args.epochs))
 
 
 def stylize(args):
@@ -217,10 +237,10 @@ def main():
                                   help="set it to 1 for running on GPU, 0 for CPU")
     train_arg_parser.add_argument("--seed", type=int, default=42,
                                   help="random seed for training")
-    train_arg_parser.add_argument("--content-weight", type=float, default=1e5,
-                                  help="weight for content-loss, default is 1e5")
-    train_arg_parser.add_argument("--style-weight", type=float, default=1e10,
-                                  help="weight for style-loss, default is 1e10")
+    train_arg_parser.add_argument("--content-weight", type=float, default=1,
+                                  help="weight for content-loss, default is 1")
+    train_arg_parser.add_argument("--style-weight", type=float, default=1e5,
+                                  help="weight for style-loss, default is 1e5")
     train_arg_parser.add_argument("--lr", type=float, default=1e-3,
                                   help="learning rate, default is 1e-3")
     train_arg_parser.add_argument("--log-interval", type=int, default=500,

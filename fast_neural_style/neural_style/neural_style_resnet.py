@@ -12,6 +12,8 @@ from torchvision import datasets
 from torchvision import transforms
 import torch.onnx
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+
 import utils
 from transformer_net import TransformerNet
 from resnet import ResNet18
@@ -76,6 +78,8 @@ def train(args):
     features_style = resnet(utils.normalize_batch(style))
     # 根据风格图片在 VGG 网络中每一模块的输出构造 Gram 矩阵
     gram_style = [utils.gram_matrix(y) for y in features_style]
+
+    loss_history = []
 
     # 训练过程
     for e in range(args.epochs):
@@ -145,6 +149,8 @@ def train(args):
                 pbar.set_postfix({'total_loss': '%.4f' % float((agg_content_loss + agg_style_loss) / (batch_id + 1))})
                 pbar.update(1)
 
+                loss_history.append(float((agg_content_loss + agg_style_loss) / (batch_id + 1)))
+
     # 保存最终模型
     transformer.eval().cpu()
     save_model_filename = "epoch_" + str(args.epochs) + ".pth"
@@ -152,6 +158,14 @@ def train(args):
     torch.save(transformer.state_dict(), save_model_path)
 
     print("\nDone, trained model saved at", save_model_path)
+
+    t = np.linspace(1, len(loss_history), len(loss_history))
+    plt.plot(t, loss_history, label='Loss')
+    plt.title('Loss history')
+    plt.xlabel('step')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig(fname="loss_history_{}.jpg".format(args.epochs))
 
 
 def stylize(args):
