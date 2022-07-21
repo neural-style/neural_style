@@ -213,10 +213,10 @@ def random_stylize(base):
     seed = 42
 
     # weight for content-loss, default is 1e5
-    content_weight = 1e5
+    content_weight = 1
 
     # weight for style-loss, default is 1e10
-    style_weight = 1e10
+    style_weight = 1e5
 
     # learning rate, default is 1e-3
     lr = 1e-3
