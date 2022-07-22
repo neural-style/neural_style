@@ -256,6 +256,7 @@ def random_stylize(base):
     print('训练内容图像：', content_path)
     content_image = utils.load_image(content_path)
     content_transform = transforms.Compose([
+        transforms.Resize((1080, 1080)),
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
@@ -350,6 +351,7 @@ def pre_stylize(base, style):
     content_image = utils.load_image(content_image_path)
     # content_image = utils.load_image(args.content_image)
     content_transform = transforms.Compose([
+        transforms.Resize((1080, 1080)),
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
