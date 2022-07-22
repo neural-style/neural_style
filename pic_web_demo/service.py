@@ -161,7 +161,7 @@ def match(base):
         model_path = os.path.join(model, 'udnie.pth')
     content_image = utils.load_image(stcontent, scale=None)
     content_transform = transforms.Compose([
-        transforms.Resize((1080,1080)),
+        transforms.Resize((1080, 1080)),
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.mul(255))
     ])
@@ -192,7 +192,7 @@ def random_stylize(base):
     style_path_par = base + "\static\images\style\diy.jpg"
     content_path_par = base + '\static\images\input\input.jpg'
     epochs = 30
-    batch_size = 4
+    batch_size = 1
 
     # 训练图像(输入的一张图像)路径
     content_path = content_path_par
